@@ -288,6 +288,13 @@ app.delete('/tasks', (req, res) => {
   });
 });
 
+//Endpoint to ensure that unexpected  endpoints does not go through
+app.all('*', (req, res) => {
+  res.status(404).json({
+    errorMessage: "Route could not be found"
+  });
+});
+
 // Middleware function to set the start time
 function setStartTime(req, res, next) {
   req.startTime = Date.now();
