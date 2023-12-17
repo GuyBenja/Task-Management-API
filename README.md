@@ -58,7 +58,6 @@ Before you begin, ensure you have met the following requirements:
      ```bash
      npm install
      ```
- ```
 
 4. Run the server:
 
