@@ -58,19 +58,12 @@ Before you begin, ensure you have met the following requirements:
      ```bash
      npm install
      ```
+ ```
 
-4. Create a `.env` file in the project root and configure your environment variables. Example:
-
-     ```env
-     PORT=3101
-     MONGODB_CONNECTION_STRING=mongodb://localhost/taskdb
-     JWT_SECRET=mysecretkey
-     ```
-
-5. Run the server:
+4. Run the server:
 
      ```bash
-     npm start
+     node TaskManagementAPI.js
      ```
 
 ### API Endpoints
