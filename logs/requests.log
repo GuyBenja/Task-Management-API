@@ -1,0 +1,5 @@
+15-12-2023 14:31:43.964 INFO: Incoming request | #1 | resource: / | HTTP Verb GET | request #1
+15-12-2023 14:31:49.276 INFO: Incoming request | #1 | resource: /todo | HTTP Verb GET | request #1
+15-12-2023 14:32:00.388 INFO: Incoming request | #1 | resource: /todo/else | HTTP Verb GET | request #1
+15-12-2023 14:32:05.979 INFO: Incoming request | #1 | resource: /todo/health | HTTP Verb GET | request #1
+15-12-2023 14:32:06.055 INFO: Incoming request | #2 | resource: /favicon.ico | HTTP Verb GET | request #2
