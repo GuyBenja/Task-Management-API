@@ -6,12 +6,12 @@ const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 
 const app = express();
-const port = 3101;
 
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(setStartTime);
 require('dotenv').config();
+const port = process.env.PORT;
 
 const mongoConnectionString = process.env.MONGODB_CONNECTION_STRING;
 
@@ -32,7 +32,7 @@ const User = mongoose.model('User', userSchema);
 
 // Middleware function to authenticate user
 function authenticateUser(req, res, next) {
-  // Extract the token from the request headers
+  // Extract the token from the cookies
   const token = req.cookies.token;
 
   // Check if the token is present
@@ -122,15 +122,15 @@ app.post('/auth/login', async (req, res) => {
       });
     }
 
-    // If login is successful, generate a token
+    // If login is successful, generate a token for one hour
     const token = jwt.sign({ username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    // Set the token as an HTTP-only cookie
+    // Set the token as an none-HTTP-only cookie
     res.cookie('token', token, { httpOnly: false });
 
     res.status(200).json({
       message: 'Login successful',
-      token: token, 
+      token: token,
     });
   } catch (error) {
     console.error(error);
@@ -236,7 +236,7 @@ app.put('/tasks/status', (req, res) => {
 
   taskToUpdate.status = newStatus;
   res.status(200).json({
-    message: `Task with id:[${id}] has been changed to status:[${newStatus}]`
+    message: `Task with the id:[${id}] has been changed to status:[${newStatus}]`
   });
 });
 
@@ -259,7 +259,7 @@ app.put('/tasks/priority', (req, res) => {
 
   taskToUpdate.priority = newPriority;
   res.status(200).json({
-    message: `Task with id:[${id}] has been changed to priority[${newPriority}]`
+    message: `Task with the id:[${id}] has been changed to priority[${newPriority}]`
   });
 });
 
@@ -284,7 +284,7 @@ app.delete('/tasks', (req, res) => {
   allTasks.splice(taskIndex, 1);
 
   res.status(200).json({
-    message: `Task with id:[${id}] has been deleted, there are [${allTasks.length}] tasks left`
+    message: `Task with the id:[${id}] has been deleted, there are [${allTasks.length}] tasks left`
   });
 });
 
