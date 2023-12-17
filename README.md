@@ -44,7 +44,7 @@ Before you begin, ensure you have met the following requirements:
 1. Clone the repository:
 
      ```bash
-     git clone https://github.com/yourusername/task-management.git
+     git clone https://github.com/guybenja/task-management.git
      ```
 
 2. Navigate to the project directory:
@@ -78,6 +78,7 @@ Before you begin, ensure you have met the following requirements:
 #### User Registration (POST /auth/register)
 
 Request Example (POST):
+
 ```json
 POST /auth/register
 Content-Type: application/json
