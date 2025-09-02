@@ -1,8 +1,8 @@
----
 # 📝 Task Management API
 
-A modular **Node.js + Express** backend for managing tasks with user authentication, built with **MongoDB Atlas** and **JWT**.
+A modular **Node.js + Express** backend for managing tasks with user authentication, built with **MongoDB Atlas** and **JWT**.  
 This project demonstrates **clean architecture**, **security best practices**, and **scalable API design**.
+
 ---
 
 ## 🚀 Features
@@ -19,6 +19,7 @@ This project demonstrates **clean architecture**, **security best practices**, a
   - Filter tasks by status (`ALL`, `PENDING`, `LATE`, `DONE`)
   - Sort tasks by `id`, `title`, or `dueDate`
   - Update task priority (`LOW`, `MID`, `HIGH`)
+  - Ownership rules → users can only manage their own tasks, admin can manage all
 
 - 📂 **Project Standards**
 
@@ -27,6 +28,10 @@ This project demonstrates **clean architecture**, **security best practices**, a
   - Modular structure (routes, models, utils, middleware)
   - Environment-based configuration with dotenv
 
+- 📖 **API Documentation**
+  - Integrated Swagger (OpenAPI 3.0)
+  - Interactive docs at [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
+
 ---
 
 ## 🛠️ Tech Stack
@@ -34,8 +39,8 @@ This project demonstrates **clean architecture**, **security best practices**, a
 - **Backend:** Node.js, Express.js
 - **Database:** MongoDB Atlas + Mongoose
 - **Auth:** JWT + bcrypt
+- **Documentation:** Swagger + swagger-jsdoc + swagger-ui-express
 - **Testing (planned):** Jest + Supertest
-- **Documentation (planned):** Swagger/OpenAPI
 - **Deployment Ready (planned):** Docker & Docker Compose
 
 ---
@@ -43,14 +48,16 @@ This project demonstrates **clean architecture**, **security best practices**, a
 ## 📂 Project Structure
 
 ```
+
 src/
- ├─ app.js              # Express app setup
- ├─ server.js           # Server entry point
- ├─ config/             # DB connection
- ├─ models/             # Mongoose schemas
- ├─ routes/             # API endpoints
- ├─ middleware/         # Auth & error handling
- └─ utils/              # Validators & response helpers
+├─ app.js              # Express app setup
+├─ server.js           # Server entry point
+├─ config/             # DB + Swagger config
+├─ models/             # Mongoose schemas
+├─ routes/             # API endpoints
+├─ middleware/         # Auth & error handling
+└─ utils/              # Validators & response helpers
+
 ```
 
 ---
@@ -85,33 +92,37 @@ npm start
 ```
 
 The server will be running at:
-👉 `http://localhost:3000/health`
+
+- Health check → [http://localhost:3000/health](http://localhost:3000/health)
+- Swagger docs → [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
 
 ---
 
 ## 📌 API Overview
 
-| Method | Endpoint        | Description          |
-| ------ | --------------- | -------------------- |
-| POST   | /auth/register  | Register a new user  |
-| POST   | /auth/login     | Login & receive JWT  |
-| POST   | /tasks/new      | Create a task        |
-| GET    | /tasks/size     | Get task count       |
-| GET    | /tasks/content  | Get filtered tasks   |
-| PUT    | /tasks/status   | Update task status   |
-| PUT    | /tasks/priority | Update task priority |
-| DELETE | /tasks          | Delete a task        |
+| Method | Endpoint        | Description                |
+| ------ | --------------- | -------------------------- |
+| GET    | /health         | Health check               |
+| POST   | /auth/register  | Register a new user        |
+| POST   | /auth/login     | Login & receive JWT cookie |
+| POST   | /tasks/new      | Create a task              |
+| GET    | /tasks/size     | Get task count             |
+| GET    | /tasks/content  | Get filtered tasks         |
+| PUT    | /tasks/status   | Update task status         |
+| PUT    | /tasks/priority | Update task priority       |
+| DELETE | /tasks          | Delete a task              |
 
-📌 Full request/response examples → see Postman collection in repo.
+📌 Full request/response examples → use Swagger UI.
 
 ---
 
 ## 🎯 Roadmap
 
-- [ ] Add Swagger documentation
+- [x] Add Swagger documentation
 - [ ] Add automated tests (Jest + Supertest)
 - [ ] Dockerize (API + MongoDB)
 - [ ] Expand admin-only endpoints
+- [ ] Add CI/CD pipeline (GitHub Actions)
 
 ---
 
