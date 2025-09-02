@@ -9,17 +9,25 @@ const { errorHandler } = require('./middleware/error');
 
 const app = express();
 
-app.use(express.json());         // במקום body-parser.json()
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swagger');
+
+// Swagger צריך לבוא לפני ה-auth
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+app.use(express.json());
 app.use(cookieParser());
 
 // health + auth
 app.use(authRoutes);
 
-// protected routes
+// ראוטים מוגנים
 app.use(auth, taskRoutes);
 
 // 404
-app.all('*', (req,res)=> res.status(404).json({ success:false, message:'Route not found', data:null, error:{} }));
+app.all('*', (req,res)=> 
+  res.status(404).json({ success:false, message:'Route not found', data:null, error:{} })
+);
 
 // error handler
 app.use(errorHandler);

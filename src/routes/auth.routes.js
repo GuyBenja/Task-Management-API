@@ -6,8 +6,66 @@ const { ok, fail } = require('../utils/responses');
 
 const router = express.Router();
 
+/**
+ * @openapi
+ * /health:
+ *   get:
+ *     summary: Health check
+ *     tags: [System]
+ *     security: []
+ *     responses:
+ *       200:
+ *         description: Server is up
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiResponse'
+ */
 router.get('/health', (req,res)=> ok(res,'Welcome, the server is up and running'));
 
+/**
+ * @openapi
+ * /auth/register:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Auth]
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [username, password]
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: "u1"
+ *               password:
+ *                 type: string
+ *                 example: "pass"
+ *               role:
+ *                 type: string
+ *                 example: "user"
+ *     responses:
+ *       201:
+ *         description: Created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/ApiResponse'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       $ref: '#/components/schemas/UserPublic'
+ *       400:
+ *         description: Invalid input
+ *       409:
+ *         description: Username exists
+ *       500:
+ *         description: Server error
+ */
 router.post('/auth/register', async (req,res)=>{
   const { username, password, role='user' } = req.body || {};
   if (!username || !password) return fail(res,'Invalid username or password',{},400);
@@ -22,6 +80,51 @@ router.post('/auth/register', async (req,res)=>{
   }
 });
 
+/**
+ * @openapi
+ * /auth/login:
+ *   post:
+ *     summary: User login (sets cookie "token")
+ *     tags: [Auth]
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [username, password]
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: "u1"
+ *               password:
+ *                 type: string
+ *                 example: "pass"
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         headers:
+ *           Set-Cookie:
+ *             schema:
+ *               type: string
+ *               example: "token=eyJ...; Path=/; HttpOnly"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/ApiResponse'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       $ref: '#/components/schemas/LoginData'
+ *       400:
+ *         description: Invalid input
+ *       401:
+ *         description: Invalid credentials
+ *       500:
+ *         description: Server error
+ */
 router.post('/auth/login', async (req,res)=>{
   const { username, password } = req.body || {};
   if (!username || !password) return fail(res,'Invalid username or password',{},400);
@@ -31,8 +134,11 @@ router.post('/auth/login', async (req,res)=>{
     const match = await bcrypt.compare(password, user.password);
     if (!match) return fail(res,'Invalid username or password',{},401);
 
-    const token = jwt.sign({ username:user.username, role:user.role }, process.env.JWT_SECRET, { expiresIn:'1h' });
-    res.cookie('token', token, { httpOnly:false }); // אם תרצה אבטחה גבוהה: true + sameSite/secure
+    const token = jwt.sign(
+    { id: user._id.toString(), username: user.username, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: '1h' });
+    res.cookie('token', token, { httpOnly:false }); 
     return ok(res,'Login successful',{ token });
   } catch (e) {
     return fail(res,'Error during login',{details:e.message},500);
