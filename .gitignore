@@ -1,2 +1,18 @@
-node_modules/
-.env
+# Node / workspaces
+**/node_modules
+**/.env
+**/.env.*
+npm-debug.log*
+
+# Expo / RN
+mobile/.expo
+mobile/.expo-shared
+mobile/ios
+mobile/android
+
+# Mobile env (נראה מיד)
+mobile/src/config/env.ts
+
+# OS
+.DS_Store
+Thumbs.db

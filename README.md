@@ -1,136 +1,252 @@
-# 📝 Task Management API
+# 📝 Task Manager — Monorepo (Backend + Mobile)
 
-A modular **Node.js + Express** backend for managing tasks with user authentication, built with **MongoDB Atlas** and **JWT**.  
-This project demonstrates **clean architecture**, **security best practices**, and **scalable API design**.
+A full-stack **Task Management** project:
+
+- **Backend** — Node.js + Express + MongoDB (JWT + RBAC, Swagger, tests)
+- **Mobile** — React Native (Expo), consuming the API with cookie-based auth
+
+Built to demonstrate **clean architecture**, **security best practices**, and **production-ready API + client**.
+
+---
+
+## 🌳 Repository Structure
+
+```
+Task-Management-API/
+├─ backend/                      # Node + Express + MongoDB API
+│  ├─ src/
+│  │  ├─ app.js                  # Express app setup (security, routes, docs)
+│  │  ├─ server.js               # Server entry (binds 0.0.0.0)
+│  │  ├─ config/
+│  │  │  ├─ db.js                # Mongoose connect/disconnect
+│  │  │  └─ swagger.js           # OpenAPI (swagger-jsdoc)
+│  │  ├─ middleware/             # auth, error handler
+│  │  ├─ models/                 # User.js, Task.js (Mongoose)
+│  │  ├─ routes/                 # auth.routes.js, tasks.routes.js
+│  │  └─ utils/                  # responses.js, validators.js
+│  ├─ tests/                     # Jest + Supertest (auth, RBAC, pagination)
+│  ├─ .env / .env.test / .env.example
+│  └─ package.json
+├─ mobile/                       # Expo React Native app
+│  ├─ App.tsx
+│  ├─ app.json
+│  └─ src/
+│     ├─ api/                    # axios client
+│     ├─ components/             # TaskCard, TaskActions, FiltersBar, etc.
+│     ├─ config/env.ts           # API_BASE_URL (your LAN IP)
+│     ├─ context/                # AuthContext (SecureStore)
+│     ├─ navigation/             # Stack navigator
+│     ├─ screens/                # Login, Register, Tasks
+│     └─ theme/ui/hooks/...      # UI & helpers
+├─ package.json                  # Root (workspaces + scripts + overrides)
+└─ .gitignore
+```
 
 ---
 
 ## 🚀 Features
 
-- 🔒 **Authentication & Authorization**
+### Backend
 
-  - User registration & login with JWT tokens
-  - Passwords hashed securely with bcrypt
-  - Role-based access (`user` / `admin`)
+- 🔒 **Auth & RBAC** — Register/Login with JWT (cookie), bcrypt hashing; roles: `user` / `admin`
+- ✅ **Tasks**
 
-- 📌 **Task Management**
+  - Create / list / update status / update priority / delete
+  - **Filters**: `ALL | PENDING | LATE | DONE`
+  - **Sorting**: `id | dueDate | title | priority | status`
 
-  - Create, update, delete, and retrieve tasks
-  - Filter tasks by status (`ALL`, `PENDING`, `LATE`, `DONE`)
-  - Sort tasks by `id`, `title`, or `dueDate`
-  - Update task priority (`LOW`, `MID`, `HIGH`)
-  - Ownership rules → users can only manage their own tasks, admin can manage all
+    > `id` maps to creation time (`createdAt`) for stable order
 
-- 📂 **Project Standards**
+  - **Pagination**: `limit` (1–100, default 20), `skip` (offset)
+  - Ownership: users see/manage **their** tasks; admin sees/manages **all**
 
-  - Consistent JSON responses
-  - Centralized error handling
-  - Modular structure (routes, models, utils, middleware)
-  - Environment-based configuration with dotenv
+- 🧱 **API**
 
-- 📖 **API Documentation**
-  - Integrated Swagger (OpenAPI 3.0)
-  - Interactive docs at [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
+  - Consistent envelope `{ success, message, data, error }`
+  - Central error handler
+  - Swagger (OpenAPI) at `/api-docs`
+
+- 🛡️ **Security**
+
+  - Helmet, CORS, rate-limit, cookie parser
+
+### Mobile (Expo)
+
+- 📱 **Screens**: Login, Register, Tasks
+- 🧭 **UX**: 3-dot actions per task (change Status/Priority), clear Logout, “New Task”
+- 🔎 **Filters**: status + sort (incl. `dueDate`)
+- 🔐 **Auth**: cookie + token persisted with `expo-secure-store`
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Backend:** Node.js, Express.js
-- **Database:** MongoDB Atlas + Mongoose
-- **Auth:** JWT + bcrypt
-- **Documentation:** Swagger + swagger-jsdoc + swagger-ui-express
-- **Testing (planned):** Jest + Supertest
-- **Deployment Ready (planned):** Docker & Docker Compose
-
----
-
-## 📂 Project Structure
-
-```
-
-src/
-├─ app.js              # Express app setup
-├─ server.js           # Server entry point
-├─ config/             # DB + Swagger config
-├─ models/             # Mongoose schemas
-├─ routes/             # API endpoints
-├─ middleware/         # Auth & error handling
-└─ utils/              # Validators & response helpers
-
-```
+- **Backend:** Node.js, Express, Mongoose, JWT, bcrypt
+- **Docs:** Swagger (swagger-jsdoc + swagger-ui-express)
+- **Mobile:** React Native (Expo), React Navigation, axios, SecureStore
+- **Tests:** Jest + Supertest
 
 ---
 
 ## ⚙️ Getting Started
 
-### 1. Clone repository
+### 1) Clone
 
 ```bash
 git clone https://github.com/GuyBenja/Task-Management-API.git
 cd Task-Management-API
 ```
 
-### 2. Install dependencies
+### 2) Install (root + workspaces)
 
 ```bash
+# root
 npm install
+
+# backend
+cd backend && npm install
+
+# mobile
+cd ../mobile && npm install
 ```
 
-### 3. Create `.env` file
+### 3) Environment
+
+#### `backend/.env`
 
 ```env
 PORT=3000
 MONGODB_CONNECTION_STRING="your-mongodb-uri"
 JWT_SECRET="your-secret-key"
+
+# Security / rate limiting
+CORS_ORIGINS=*
+RATE_WINDOW_MINUTES=15
+RATE_MAX=100
 ```
 
-### 4. Run the server
+#### `backend/.env.test` (for tests — separate DB)
+
+```env
+MONGODB_CONNECTION_STRING_TEST="your-test-db-uri"
+JWT_SECRET=supersecret
+NODE_ENV=test
+```
+
+#### `mobile/src/config/env.ts`
+
+```ts
+// Use your computer's LAN IP so the phone can reach the API.
+export const API_BASE_URL = "http://<YOUR_LAN_IP>:3000";
+```
+
+> iPhone and PC must be on the **same Wi-Fi**. If needed, allow TCP 3000 in Windows Firewall.
+
+### 4) Run
+
+**Backend (Swagger at /api-docs):**
 
 ```bash
-npm start
+# from repo root
+npm run start:api
+# or
+cd backend && npm start
 ```
 
-The server will be running at:
+**Mobile (Expo):**
 
-- Health check → [http://localhost:3000/health](http://localhost:3000/health)
-- Swagger docs → [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
+```bash
+cd mobile
+# Prefer local CLI (avoids npx cache issues):
+npm run start -- -c
+# or explicitly:
+node ./node_modules/expo/bin/cli.js start -c
+```
+
+- Press **`t`** in Expo terminal to switch to **Tunnel** if LAN doesn’t work.
+- Scan the QR with **Expo Go** (iOS).
 
 ---
 
 ## 📌 API Overview
 
-| Method | Endpoint        | Description                |
-| ------ | --------------- | -------------------------- |
-| GET    | /health         | Health check               |
-| POST   | /auth/register  | Register a new user        |
-| POST   | /auth/login     | Login & receive JWT cookie |
-| POST   | /tasks/new      | Create a task              |
-| GET    | /tasks/size     | Get task count             |
-| GET    | /tasks/content  | Get filtered tasks         |
-| PUT    | /tasks/status   | Update task status         |
-| PUT    | /tasks/priority | Update task priority       |
-| DELETE | /tasks          | Delete a task              |
+| Method | Endpoint          | Description                                      |
+| -----: | ----------------- | ------------------------------------------------ |
+|   POST | `/auth/register`  | Create user (username, password, role)           |
+|   POST | `/auth/login`     | Login → sets `token` cookie (+ returns token)    |
+|   POST | `/tasks/new`      | Create task (owner = current user)               |
+|    GET | `/tasks/size`     | Count tasks (by `status`)                        |
+|    GET | `/tasks/content`  | List tasks with `status`, `sortBy`, `limit/skip` |
+|    PUT | `/tasks/status`   | Update task status (owner/admin)                 |
+|    PUT | `/tasks/priority` | Update task priority (owner/admin)               |
+| DELETE | `/tasks`          | Delete task (owner/admin)                        |
 
-📌 Full request/response examples → use Swagger UI.
+**`/tasks/content` query params**
 
----
+- `status`: `ALL | PENDING | LATE | DONE` (default `ALL`)
+- `sortBy`: `id | dueDate | title | priority | status`
+- `limit`: 1–100 (default 20), `skip`: 0+
 
-## 🎯 Roadmap
-
-- [x] Add Swagger documentation
-- [ ] Add automated tests (Jest + Supertest)
-- [ ] Dockerize (API + MongoDB)
-- [ ] Expand admin-only endpoints
-- [ ] Add CI/CD pipeline (GitHub Actions)
+📖 Full schemas & examples in **Swagger** → `/api-docs`.
 
 ---
 
-## 👤 About Me
+## 🧪 Tests (Backend)
 
-I am a **junior software developer** with a B.Sc. in Computer Science.
-This project is part of my portfolio to demonstrate backend development, security practices, and clean API design.
+```bash
+# from repo root
+npm run test:api
 
-Feel free to connect with me on [LinkedIn](https://www.linkedin.com/in/guy-binyamin-1a4323286/) or explore more of my work.
+# or directly:
+cd backend && npm test
+```
+
+- Uses `.env.test` (separate Atlas DB).
+- Includes E2E for **auth**, **RBAC**, **pagination**.
 
 ---
+
+## 🔐 Security Notes
+
+- **Never** commit `.env` / real Atlas URIs. If leaked — rotate credentials.
+- Use strong `JWT_SECRET`; set secure cookie flags behind HTTPS in production.
+- Rate-limit + Helmet are enabled; tune via env vars.
+
+---
+
+## 🧯 Expo Troubleshooting
+
+**Error:** `Package subpath './src/lib/TerminalReporter' is not defined by "exports" in metro`
+**Cause:** global `npx` pulled Metro 0.83.x which Expo SDK doesn’t expect.
+**Fix:**
+
+```powershell
+# PowerShell – from anywhere
+Get-Process -Name node -ErrorAction SilentlyContinue | Stop-Process -Force
+Remove-Item -Recurse -Force "$env:LOCALAPPDATA\npm-cache\_npx" -ErrorAction SilentlyContinue
+
+# run Expo using the local CLI
+cd mobile
+node .\node_modules\expo\bin\cli.js start -c
+```
+
+---
+
+## 🗺️ Roadmap
+
+- [x] Swagger documentation for all endpoints
+- [x] E2E tests: auth, RBAC, pagination
+- [ ] Task edit endpoint (title/content/dueDate + status recompute)
+- [ ] Search & date range filters
+- [ ] Docker & docker-compose (API + Mongo)
+- [ ] CI (GitHub Actions): lint + test + optional Docker build
+- [ ] Refresh tokens & `/auth/logout` + axios retry interceptor
+
+---
+
+## 👤 About
+
+I’m a junior software developer (B.Sc. in CS).
+This project demonstrates end-to-end API & Mobile implementation with robust auth, RBAC, and clean architecture.
+
+- LinkedIn — [https://www.linkedin.com/in/guy-binyamin-1a4323286/](https://www.linkedin.com/in/guy-binyamin-1a4323286/)

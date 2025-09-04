@@ -1,26 +1,29 @@
 {
-  "name": "apitask",
-  "version": "1.0.0",
-  "description": "",
-  "main": "TaskManagementAPI.js",
+  "name": "task-manager-monorepo",
+  "private": true,
+  "workspaces": ["backend", "mobile"],
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "bcrypt": "^5.1.1",
-    "cookie-parser": "^1.4.6",
-    "dotenv": "^16.4.5",
-    "express": "^4.18.2",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.0.3",
-    "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1"
+    "start:api": "npm --workspace backend start",
+    "test:api": "npm --workspace backend test",
+    "start:mobile": "npm --workspace mobile start",
+    "dev": "npm-run-all -p start:api start:mobile"
   },
   "devDependencies": {
-    "nodemon": "^3.1.0"
+    "npm-run-all": "^4.1.5"
+  },
+  "overrides": {
+    "metro": "0.82.5",
+    "metro-config": "0.82.5",
+    "metro-core": "0.82.5",
+    "metro-cache": "0.82.5",
+    "metro-resolver": "0.82.5",
+    "metro-runtime": "0.82.5",
+    "metro-source-map": "0.82.5",
+    "metro-symbolicate": "0.82.5",
+    "metro-transform-worker": "0.82.5",
+    "metro-babel-transformer": "0.82.5",
+    "metro-transform-plugins": "0.82.5",
+    "metro-file-map": "0.82.5",
+    "ob1": "0.82.5"
   }
 }
